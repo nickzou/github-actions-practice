@@ -1,0 +1,20 @@
+name: Create DigitalOcean Droplet
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Create Droplet
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          args: compute droplet create ${GITHUB_REF#refs/heads/}-droplet --size s-1vcpu-1gb --image ubuntu-20-04-x64 --region nyc1
