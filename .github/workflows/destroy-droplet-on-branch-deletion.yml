@@ -1,8 +1,6 @@
-name: Destroy Droplet on PR Merge
+name: Destroy Droplet on Branch Deletion
 
 on:
-  pull_request:
-    types: [closed]
   delete:
 
 jobs:
@@ -17,10 +15,10 @@ jobs:
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-      - name: Destroy Droplet on PR Merge
-        if: github.event.pull_request.merged == true || github.event_name == 'delete'
+      - name: Destroy Droplet on Branch Deletion
+        if: github.event_name == 'delete'
         run: |
           echo "Destroying Droplet..."
-          DROPLET_ID="${{ github.event.pull_request.head.ref }}"
+          DROPLET_ID="${{ github.event.ref }}"
           doctl compute droplet delete $DROPLET_ID --force
-          echo "${{ github.event.pull_request.head.ref }} destroyed."
+          echo "${{ github.event.ref }} destroyed."

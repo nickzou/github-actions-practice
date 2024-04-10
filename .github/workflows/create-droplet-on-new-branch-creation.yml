@@ -1,4 +1,4 @@
-name: Create DigitalOcean Droplet
+name: Create Droplet on Branch Creation
 
 on:
   create:
