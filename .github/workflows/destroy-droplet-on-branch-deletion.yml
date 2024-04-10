@@ -26,7 +26,7 @@ jobs:
             echo "DROPLET_EXISTS=true" >> $GITHUB_ENV
           fi
 
-      - name: Destroy Droplet on Branch Deletion
+      - name: Destroy droplet on branch deletion
         if: github.event_name == 'delete' && env.DROPLET_EXISTS == 'true'
         run: |
           echo "Destroying Droplet..."
