@@ -1,13 +1,11 @@
 name: Create DigitalOcean Droplet
 
 on:
-  push:
-    branches-ignore:
-      - main
-      - master
+  create:
 
 jobs:
-  deploy:
+  branch-created:
+    if: github.event.ref_type == 'branch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
