@@ -21,6 +21,6 @@ jobs:
         if: github.event.pull_request.merged == true || github.event_name == 'delete'
         run: |
           echo "Destroying Droplet..."
-          DROPLET_ID="${{ github.ref_name }}"
+          DROPLET_ID="${{ github.event.pull_request.ref_name }}"
           doctl compute droplet delete $DROPLET_ID --force
-          echo "${{ github.ref_name }} destroyed."
+          echo "${{ github.event.pull_request.ref_name }} destroyed."
