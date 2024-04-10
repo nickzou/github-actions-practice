@@ -23,4 +23,4 @@ jobs:
           echo "Destroying Droplet..."
           DROPLET_ID="${{ github.ref_name }}"
           doctl compute droplet delete $DROPLET_ID --force
-          echo "Droplet destroyed."
+          echo "${{ github.ref_name }} destroyed."
