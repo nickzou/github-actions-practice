@@ -28,6 +28,10 @@ jobs:
             echo "DROPLET_EXISTS=true" >> $GITHUB_ENV
           fi
 
+      - name: "Display DROPLIST_EXISTS variable"
+        run: |
+          echo ${{ env.DROPLIST_EXISTS }}
+
       - name: Destroy droplet on PR merge
         if: (github.event.pull_request.merged == true || github.event_name == 'delete') && env.DROPLET_EXISTS == 'true'
         run: |
