@@ -20,6 +20,6 @@ jobs:
         # Assuming you want to run a doctl command right after setting it up,
         # you might need to use a `run` step if `args` is not a valid input.
       - name: Execute doctl command
-        run: doctl compute droplet create example-droplet --size s-1vcpu-1gb --image ubuntu-20-04-x64 --region nyc1
+        run: doctl compute droplet create ${{ github.ref_name }} --size s-1vcpu-1gb --image ubuntu-20-04-x64 --region nyc1
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
