@@ -27,7 +27,7 @@ jobs:
           fi
 
       - name: Destroy Droplet on Branch Deletion
-        if: github.event_name == 'delete' && env.DROPLET_EXISTS
+        if: github.event_name == 'delete' && env.DROPLET_EXISTS == 'true'
         run: |
           echo "Destroying Droplet..."
           DROPLET_ID="${{ github.ref_name }}"
