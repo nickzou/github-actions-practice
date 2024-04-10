@@ -26,6 +26,10 @@ jobs:
             echo "DROPLET_EXISTS=true" >> $GITHUB_ENV
           fi
 
+      - name: "Display DROPLIST_EXISTS variable"
+        run: |
+          echo ${{ env.DROPLIST_EXISTS }}
+
       - name: Destroy droplet on branch deletion
         if: github.event_name == 'delete' && env.DROPLET_EXISTS == 'true'
         run: |
