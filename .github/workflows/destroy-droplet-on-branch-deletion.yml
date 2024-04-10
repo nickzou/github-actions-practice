@@ -15,10 +15,21 @@ jobs:
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
+      - name: "Check if droplet exists"
+        run: |
+          echo "Checking if droplet exists"
+          DROPLET_NAME="${{ github.ref_name }}"
+          EXISTS=$(doctl compute droplet list --format Name --no-header | grep -w $DROPLET_NAME | wc -l)
+          if [ "$EXISTS" -eq "0" ]; then
+            echo "DROPLET_EXISTS=false" >> $GITHUB_ENV
+          else
+            echo "DROPLET_EXISTS=true" >> $GITHUB_ENV
+          fi
+
       - name: Destroy Droplet on Branch Deletion
-        if: github.event_name == 'delete'
+        if: github.event_name == 'delete' && env.DROPLET_EXISTS
         run: |
           echo "Destroying Droplet..."
-          DROPLET_ID="${{ github.event.ref }}"
+          DROPLET_ID="${{ github.ref_name }}"
           doctl compute droplet delete $DROPLET_ID --force
-          echo "${{ github.event.ref }} destroyed."
+          echo "${{ github.event.ref_name }} destroyed."
