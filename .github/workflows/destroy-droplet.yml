@@ -1,0 +1,26 @@
+name: Destroy Droplet with doctl
+
+on:
+  pull_request:
+    types: [closed]
+  delete:
+
+jobs:
+  destroy-droplet:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Destroy Droplet on PR Merge or Branch Delete
+        if: github.event.pull_request.merged == true || github.event_name == 'delete'
+        run: |
+          echo "Destroying Droplet..."
+          DROPLET_ID="${{ github.ref_name }}"
+          doctl compute droplet delete $DROPLET_ID --force
+          echo "Droplet destroyed."
