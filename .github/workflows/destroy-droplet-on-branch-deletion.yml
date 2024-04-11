@@ -20,16 +20,11 @@ jobs:
           echo "Checking if droplet exists"
           DROPLET_NAME="${{ github.event.ref }}"
           EXISTS=$(doctl compute droplet list --format Name --no-header | grep -w $DROPLET_NAME | wc -l)
-          echo "$DROPLET_NAME"
-          if [ "$EXISTS" -eq "0" ]; then
+          if [ "$EXISTS" -eq 0 ]; then
             echo "DROPLET_EXISTS=false" >> $GITHUB_ENV
           else
             echo "DROPLET_EXISTS=true" >> $GITHUB_ENV
           fi
-
-      - name: "Display DROPLIST_EXISTS variable"
-        run: |
-          echo ${{ env.DROPLIST_EXISTS }}
 
       - name: Destroy droplet on branch deletion
         if: github.event_name == 'delete' && env.DROPLET_EXISTS == 'true'

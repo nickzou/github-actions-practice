@@ -21,16 +21,11 @@ jobs:
           echo "Checking if droplet exists"
           DROPLET_NAME="${{ github.event.pull_request.head.ref }}"
           EXISTS=$(doctl compute droplet list --format Name --no-header | grep -w $DROPLET_NAME | wc -l)
-          echo "$DROPLET_NAME"
           if [ "$EXISTS" -eq 0 ]; then
             echo "DROPLET_EXISTS=false" >> $GITHUB_ENV
           else
             echo "DROPLET_EXISTS=true" >> $GITHUB_ENV
           fi
-
-      - name: "Display DROPLIST_EXISTS variable"
-        run: |
-          echo ${{ env.DROPLIST_EXISTS }}
 
       - name: Destroy droplet on PR merge
         if: (github.event.pull_request.merged == true || github.event_name == 'delete') && env.DROPLET_EXISTS == 'true'
