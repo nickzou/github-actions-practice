@@ -3,7 +3,6 @@ name: Destroy Droplet on PR Merge
 on:
   pull_request:
     types: [closed]
-  delete:
 
 jobs:
   destroy-droplet:
