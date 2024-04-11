@@ -1,5 +1,8 @@
 name: Destroy Droplet on Branch Deletion
 
+env:
+  CURRENT_BRANCH: ${{ github.ref_name }}
+
 on:
   delete:
 
@@ -18,7 +21,7 @@ jobs:
       - name: "Check if droplet exists"
         run: |
           echo "Checking if droplet exists"
-          DROPLET_NAME="${{ github.ref_name }}"
+          DROPLET_NAME="${{ env.CURRENT_BRANCH }}"
           EXISTS=$(doctl compute droplet list --format Name --no-header | grep -w $DROPLET_NAME | wc -l)
           echo "$DROPLET_NAME"
           if [ "$EXISTS" -eq "0" ]; then
