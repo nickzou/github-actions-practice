@@ -1,5 +1,8 @@
 name: Create Droplet on Branch Creation
 
+env:
+  DIGITALOCEAN_PROJECT_ID: ${{secrets.DIGITALOCEAN_PROJECT_ID}}
+
 on:
   create:
 
@@ -17,7 +20,12 @@ jobs:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
         # Assuming you want to run a doctl command right after setting it up,
         # you might need to use a `run` step if `args` is not a valid input.
-      - name: Execute doctl command
+      - name: Create Droplet
         run: doctl compute droplet create ${{ github.ref_name }} --size s-1vcpu-1gb --image ubuntu-20-04-x64 --region nyc1
+        env:
+          DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Move Droplet to Designated Project
+        run: doctl projects resources assign ${{ env.DIGITALOCEAN_PROJECT_ID }} --resource=do:droplet:${{ github.ref_name }}
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
