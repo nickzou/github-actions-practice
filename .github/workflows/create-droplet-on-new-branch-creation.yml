@@ -1,5 +1,8 @@
 name: Create Droplet on Branch Creation
 
+env:
+  BRANCH_NAME: ${{ github.ref_name }}
+
 on:
   create:
 
@@ -27,16 +30,16 @@ jobs:
       - name: Add SSH key to DigitalOcean
         run: |
           echo "${{ env.PUBLIC_KEY}}" >> public_key.tmp
-          doctl compute ssh-key import ${{ github.ref_name }} --public-key-file public_key.tmp
+          doctl compute ssh-key import ${{ env.BRANCH_NAME }} --public-key-file public_key.tmp
 
       - name: Get SSH key ID
         run: |
-          KEY_ID=$(doctl compute ssh-key list --format ID,Name --no-header | grep "${{ github.ref_name }}" | awk '{print $1}')
+          KEY_ID=$(doctl compute ssh-key list --format ID,Name --no-header | grep "${{ env.BRANCH_NAME }}" | awk '{print $1}')
           echo "KEY_ID=$KEY_ID" >> $GITHUB_ENV
 
       - name: Create Droplet
         run: |
-          read DROPLET_ID DROPLET_IP <<< $(doctl compute droplet create ${{ github.ref_name }} --size s-1vcpu-1gb --image ubuntu-20-04-x64 --region nyc1 --ssh-keys ${{env.KEY_ID}} --format ID,PublicIPv4 --no-header --wait)
+          read DROPLET_ID DROPLET_IP <<< $(doctl compute droplet create ${{ env.BRANCH_NAME }} --size s-1vcpu-1gb --image ubuntu-20-04-x64 --region nyc1 --ssh-keys ${{env.KEY_ID}} --format ID,PublicIPv4 --no-header --wait)
           echo "DROPLET_ID=$DROPLET_ID" >> $GITHUB_ENV
           echo "DROPLET_IP=$DROPLET_IP" >> $GITHUB_ENV
         env:
@@ -61,7 +64,7 @@ jobs:
 
       - name: Remove SSH key from DigitalOcean
         run: |
-          SSH_KEY_ID=$(doctl compute ssh-key list --format ID,Name --no-header | grep "${{ github.ref_name }}" | awk '{print $1}')
+          SSH_KEY_ID=$(doctl compute ssh-key list --format ID,Name --no-header | grep "${{ env.BRANCH_NAME }}" | awk '{print $1}')
           if [[ -n "$SSH_KEY_ID" ]]; then
             doctl compute ssh-key delete $SSH_KEY_ID --force
           else
