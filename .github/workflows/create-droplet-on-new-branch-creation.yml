@@ -55,10 +55,6 @@ jobs:
             sleep 30
           done
 
-      - name: Ensure directory exists
-        run: |
-          ssh -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no root@${{ env.DROPLET_IP }} "sudo mkdir -p /var/www/html && sudo chown -R $USER:$USER /var/www/html"
-
       - name: Transfer index.html to droplet
         run: |
           scp -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no ./index.html root@${{ env.DROPLET_IP }}:/var/www/html/
@@ -66,4 +62,8 @@ jobs:
       - name: Remove SSH key from DigitalOcean
         run: |
           SSH_KEY_ID=$(doctl compute ssh-key list --format ID,Name --no-header | grep "${{ github.ref_name }}" | awk '{print $1}')
-          doctl compute ssh-key delete $SSH_KEY_ID --force
+          if [[ -n "$SSH_KEY_ID" ]]; then
+            doctl compute ssh-key delete $SSH_KEY_ID --force
+          else
+            echo "No SSH key found for deletion."
+          fi

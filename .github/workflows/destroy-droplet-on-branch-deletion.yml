@@ -33,3 +33,12 @@ jobs:
           DROPLET_ID="${{ github.event.ref }}"
           doctl compute droplet delete $DROPLET_ID --force
           echo "${{ github.event.ref }} destroyed."
+
+      - name: Remove SSH key from DigitalOcean
+        run: |
+          SSH_KEY_ID=$(doctl compute ssh-key list --format ID,Name --no-header | grep "${{ github.ref_name }}" | awk '{print $1}')
+          if [[ -n "$SSH_KEY_ID" ]]; then
+            doctl compute ssh-key delete $SSH_KEY_ID --force
+          else
+            echo "No SSH key found for deletion."
+          fi
