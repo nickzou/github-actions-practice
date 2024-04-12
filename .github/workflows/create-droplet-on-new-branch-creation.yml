@@ -57,7 +57,7 @@ jobs:
 
       - name: Ensure directory exists
         run: |
-          ssh -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no user@${{ env.DROPLET_IP }} "sudo mkdir -p /var/www/html && sudo chown -R $USER:$USER /var/www/html"
+          ssh -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no root@${{ env.DROPLET_IP }} "sudo mkdir -p /var/www/html && sudo chown -R $USER:$USER /var/www/html"
 
       - name: Transfer index.html to droplet
         run: |
