@@ -1,5 +1,8 @@
 name: Destroy Droplet on Branch Deletion
 
+env:
+  BRANCH_NAME: ${{ github.event.ref }}
+
 on:
   delete:
 
@@ -18,7 +21,7 @@ jobs:
       - name: "Check if droplet exists"
         run: |
           echo "Checking if droplet exists"
-          DROPLET_NAME="${{ github.event.ref }}"
+          DROPLET_NAME="${{ env.BRANCH_NAME }}"
           EXISTS=$(doctl compute droplet list --format Name --no-header | grep -w $DROPLET_NAME | wc -l)
           if [ "$EXISTS" -eq 0 ]; then
             echo "DROPLET_EXISTS=false" >> $GITHUB_ENV
@@ -30,13 +33,13 @@ jobs:
         if: github.event_name == 'delete' && env.DROPLET_EXISTS == 'true'
         run: |
           echo "Destroying Droplet..."
-          DROPLET_ID="${{ github.event.ref }}"
+          DROPLET_ID="${{ env.BRANCH_NAME }}"
           doctl compute droplet delete $DROPLET_ID --force
-          echo "${{ github.event.ref }} destroyed."
+          echo "${{ env.BRANCH_NAME }} destroyed."
 
       - name: Remove SSH key from DigitalOcean
         run: |
-          SSH_KEY_ID=$(doctl compute ssh-key list --format ID,Name --no-header | grep "${{ github.ref_name }}" | awk '{print $1}')
+          SSH_KEY_ID=$(doctl compute ssh-key list --format ID,Name --no-header | grep "${{ env.BRANCH_NAME }}" | awk '{print $1}')
           if [[ -n "$SSH_KEY_ID" ]]; then
             doctl compute ssh-key delete $SSH_KEY_ID --force
           else
