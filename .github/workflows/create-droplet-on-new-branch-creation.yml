@@ -27,11 +27,11 @@ jobs:
       - name: Add SSH key to DigitalOcean
         run: |
           echo "${{ env.PUBLIC_KEY}}" >> public_key.tmp
-          doctl compute ssh-key import github-actions-key --public-key-file public_key.tmp
+          doctl compute ssh-key import ${{ github.ref_name }} --public-key-file public_key.tmp
 
       - name: Get SSH key ID
         run: |
-          KEY_ID=$(doctl compute ssh-key list --format ID,Name --no-header | grep "github-actions-key" | awk '{print $1}')
+          KEY_ID=$(doctl compute ssh-key list --format ID,Name --no-header | grep "${{ github.ref_name }}" | awk '{print $1}')
           echo "KEY_ID=$KEY_ID" >> $GITHUB_ENV
 
       - name: Create Droplet
@@ -65,5 +65,5 @@ jobs:
 
       - name: Remove SSH key from DigitalOcean
         run: |
-          SSH_KEY_ID=$(doctl compute ssh-key list --format ID,Name --no-header | grep github-actions-key | awk '{print $1}')
+          SSH_KEY_ID=$(doctl compute ssh-key list --format ID,Name --no-header | grep "${{ github.ref_name }}" | awk '{print $1}')
           doctl compute ssh-key delete $SSH_KEY_ID --force
