@@ -20,9 +20,20 @@ jobs:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
         # Assuming you want to run a doctl command right after setting it up,
         # you might need to use a `run` step if `args` is not a valid input.
+
+      - name: Generate SSH key
+        run: |
+          ssh-keygen -t rsa -b 4096 -C "github-action@mydomain.com" -f ${{ github.workspace }}/deploy_key -N ""
+          PUBLIC_KEY=$(cat ${{ github.workspace }}/deploy_key.pub)
+          echo "PUBLIC_KEY=$PUBLIC_KEY" >> $GITHUB_ENV
+
+      - name: Add SSH key to DigitalOcean
+        run: |
+          doctl compute ssh-key import github-actions-key --public-key "$PUBLIC_KEY"
+
       - name: Create Droplet
         run: |
-          DROPLET_ID=$(doctl compute droplet create ${{ github.ref_name }} --size s-1vcpu-1gb --image ubuntu-20-04-x64 --region nyc1 --format ID --no-header --wait)
+          DROPLET_ID=$(doctl compute droplet create ${{ github.ref_name }} --size s-1vcpu-1gb --image ubuntu-20-04-x64 --region nyc1 --ssh-keys $(echo "$PUBLIC_KEY") --format ID,PublicIPv4 --no-header --wait)
           echo "DROPLET_ID=$DROPLET_ID" >> $GITHUB_ENV
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
@@ -31,3 +42,20 @@ jobs:
         run: doctl projects resources assign ${{ env.DIGITALOCEAN_PROJECT_ID }} --resource=do:droplet:${{ env.DROPLET_ID }}
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Wait for droplet SSH to be ready
+        run: |
+          until ssh -i ${{ github.workspace }}/deploy_key -o ConnectTimeout=10 -o StrictHostKeyChecking=no root@$DROPLET_IP echo "SSH is up"
+          do
+            echo "Waiting for SSH to be active..."
+            sleep 30
+          done
+
+      - name: Transfer index.html to droplet
+        run: |
+          scp -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no ./index.html root@$DROPLET_IP:/var/www/html/
+
+      - name: Remove SSH key from DigitalOcean
+        run: |
+          SSH_KEY_ID=$(doctl compute ssh-key list --format ID,Name --no-header | grep github-actions-key | awk '{print $1}')
+          doctl compute ssh-key delete $SSH_KEY_ID --force
