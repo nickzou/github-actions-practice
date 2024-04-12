@@ -29,7 +29,7 @@ jobs:
 
       - name: Add SSH key to DigitalOcean
         run: |
-          doctl compute ssh-key import github-actions-key --public-key "$PUBLIC_KEY"
+          doctl compute ssh-key import github-actions-key --public-key "${{ env.PUBLIC_KEY }}"
 
       - name: Create Droplet
         run: |
