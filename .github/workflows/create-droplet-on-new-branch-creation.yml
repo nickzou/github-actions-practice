@@ -60,7 +60,7 @@ jobs:
 
       - name: Transfer index.html to droplet
         run: |
-          scp -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no ./index.html root@${{ env.DROPLET_IP }}:/var/www/html/
+          scp -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no ./index.html root@${{ env.DROPLET_IP }}:/root/
 
       - name: Remove SSH key from DigitalOcean
         run: |
