@@ -58,9 +58,9 @@ jobs:
             sleep 30
           done
 
-      - name: Install Nginx
+      - name: Install Nginx on droplet
         run: |
-          ssh -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no root@${{ env.DROPLET_IP }} "apt-get update && apt-get install -y nginx"
+          ssh -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no root@${{ env.DROPLET_IP }} "while fuser /var/lib/dpkg/lock >/dev/null 2>&1; do echo 'Waiting for other software managers to finish...'; sleep 2; done; apt-get update && apt-get install -y nginx"
 
       - name: Transfer index.html to droplet
         run: |
