@@ -60,7 +60,7 @@ jobs:
 
       - name: Install Nginx with enhanced cleanup and locking handling
         run: |
-          ssh -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no root@${{ env.DROPLET_IP }} "sudo apt-get update -qq && sudo apt-get install -y nginx"
+          ssh -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no root@${{ env.DROPLET_IP }} "sudo apt-get install -y nginx"
 
       - name: Transfer index.html to droplet
         run: |
