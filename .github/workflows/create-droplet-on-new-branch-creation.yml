@@ -60,9 +60,9 @@ jobs:
 
       - name: Install Nginx with enhanced cleanup and locking handling
         run: |
-          until ssh -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no root@${{ env.DROPLET_IP }} "sudo apt-get update -qq"
+          until ssh -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no root@${{ env.DROPLET_IP }} "sudo apt-get update && sudo apt-get install -y nginx"
           do
-            echo "Waiting until apt-get is complete..."
+            echo "Waiting until nginx installation is complete is complete..."
             sleep 30
           done
 
