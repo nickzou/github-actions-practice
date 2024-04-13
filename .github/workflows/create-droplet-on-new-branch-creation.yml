@@ -61,6 +61,10 @@ jobs:
       - name: Install Nginx with enhanced cleanup and locking handling
         run: |
           until ssh -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no root@${{ env.DROPLET_IP }} "sudo apt-get update -qq"
+          do
+            echo "Waiting until apt-get is complete..."
+            sleep 30
+          done
 
       - name: Transfer index.html to droplet
         run: |
