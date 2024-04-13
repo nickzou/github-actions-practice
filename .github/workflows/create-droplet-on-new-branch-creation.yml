@@ -58,9 +58,13 @@ jobs:
             sleep 30
           done
 
+      - name: Install Nginx
+        run: |
+          ssh -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no root@${{ env.DROPLET_IP }} "apt-get update && apt-get install -y nginx"
+
       - name: Transfer index.html to droplet
         run: |
-          scp -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no ./index.html root@${{ env.DROPLET_IP }}:/root/
+          scp -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no ./index.html root@${{ env.DROPLET_IP }}:/var/www/html/
 
       - name: Remove SSH key from DigitalOcean
         run: |
