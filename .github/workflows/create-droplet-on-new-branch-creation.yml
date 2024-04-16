@@ -72,7 +72,7 @@ jobs:
 
       - name: Add A record for subdomain
         run: |
-          doctl compute domain records create ${{ secrets.DOMAIN_NAME }} --record-type A --record-data ${{ env.DROPLET_IP }}
+          doctl compute domain records create ${{ secrets.DOMAIN_NAME }} --record-name ${{ secrets.DOMAIN_NAME }} --record-type A --record-data ${{ env.DROPLET_IP }}
 
       - name: Remove SSH key from DigitalOcean
         run: |
