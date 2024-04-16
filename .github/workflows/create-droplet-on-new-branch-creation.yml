@@ -72,7 +72,7 @@ jobs:
 
       - name: Add A record for subdomain
         run: |
-          doctl compute domain records create pandacalculus.com --record-name pandacalculus.com --record-type A --record-data ${{ env.DROPLET_IP }}
+          doctl compute domain create pandacalculus.com --record-name pandacalculus.com --record-type A --record-data ${{ env.DROPLET_IP }}
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
