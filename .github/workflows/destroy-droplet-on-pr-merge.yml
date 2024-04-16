@@ -38,6 +38,12 @@ jobs:
           doctl compute droplet delete $DROPLET_ID --force
           echo "${{ env.BRANCH_NAME }} destroyed."
 
+      - name: Destroy droplet on PR merge
+        if: (github.event.pull_request.merged == true || github.event_name == 'delete') && env.DROPLET_EXISTS == 'true'
+        run: doctl compute domain delete pandacalculus.com
+        env:
+          DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
       - name: Remove SSH key from DigitalOcean
         run: |
           SSH_KEY_ID=$(doctl compute ssh-key list --format ID,Name --no-header | grep "${{ env.BRANCH_NAME }}" | awk '{print $1}')
