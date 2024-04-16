@@ -38,7 +38,7 @@ jobs:
           doctl compute droplet delete $DROPLET_ID --force
           echo "${{ env.BRANCH_NAME }} destroyed."
 
-      - name: Destroy droplet on PR merge
+      - name: Delete domain
         if: (github.event.pull_request.merged == true || github.event_name == 'delete') && env.DROPLET_EXISTS == 'true'
         run: doctl compute domain delete pandacalculus.com
         env:
