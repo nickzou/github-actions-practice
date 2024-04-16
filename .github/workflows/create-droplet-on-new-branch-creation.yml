@@ -70,6 +70,10 @@ jobs:
         run: |
           scp -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no ./index.html root@${{ env.DROPLET_IP }}:/var/www/html/
 
+      - name: Add A record for subdomain
+        run: |
+          doctl compute domain records create ${{ secrets.DOMAIN_NAME }} --record-type A --record-name ${{ env.BRANCH_NAME }} --record-data ${{ env.DROPLET_IP }} --record-ttl 1800
+
       - name: Remove SSH key from DigitalOcean
         run: |
           SSH_KEY_ID=$(doctl compute ssh-key list --format ID,Name --no-header | grep "${{ env.BRANCH_NAME }}" | awk '{print $1}')
