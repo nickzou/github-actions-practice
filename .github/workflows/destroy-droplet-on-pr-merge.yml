@@ -38,9 +38,15 @@ jobs:
           doctl compute droplet delete $DROPLET_ID --force
           echo "${{ env.BRANCH_NAME }} destroyed."
 
-      - name: Delete domain
+      # - name: Delete domain
+      #   if: (github.event.pull_request.merged == true || github.event_name == 'delete') && env.DROPLET_EXISTS == 'true'
+      #   run: doctl compute domain delete pandacalculus.com --force
+      #   env:
+      #     DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Delete subdomain
         if: (github.event.pull_request.merged == true || github.event_name == 'delete') && env.DROPLET_EXISTS == 'true'
-        run: doctl compute domain delete pandacalculus.com --force
+        run: doctl compute domain records delete pandacalculus.com ${{ env.BRANCH_NAME }} --force
         env:
           DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
