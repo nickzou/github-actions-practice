@@ -30,7 +30,7 @@ jobs:
 
       - name: Add SSH key to DigitalOcean
         run: |
-          echo "${{ env.PUBLIC_KEY}}" >> public_key.tmp
+          echo "${{ env.PUBLIC_KEY }}" >> public_key.tmp
           doctl compute ssh-key import ${{ env.BRANCH_NAME }} --public-key-file public_key.tmp
 
       - name: Get SSH key ID
