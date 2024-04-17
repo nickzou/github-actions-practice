@@ -71,11 +71,11 @@ jobs:
         run: |
           scp -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no ./index.html root@${{ env.DROPLET_IP }}:/var/www/html/
 
-      - name: Add A record for domain
-        run: |
-          doctl compute domain create ${{ env.DOMAIN_NAME }} --ip-address ${{ env.DROPLET_IP }}
-        env:
-          DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      # - name: Add A record for domain
+      #   run: |
+      #     doctl compute domain create ${{ env.DOMAIN_NAME }} --ip-address ${{ env.DROPLET_IP }}
+      #   env:
+      #     DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
       - name: Add A record for subdomain
         run: |
