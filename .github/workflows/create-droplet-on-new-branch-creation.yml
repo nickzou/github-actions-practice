@@ -40,7 +40,7 @@ jobs:
 
       - name: Create Droplet
         run: |
-          read DROPLET_ID DROPLET_IP <<< $(doctl compute droplet create ${{ env.BRANCH_NAME }} --size s-1vcpu-1gb --image ubuntu-20-04-x64 --region nyc1 --ssh-keys ${{env.KEY_ID}} --format ID,PublicIPv4 --no-header --wait)
+          read DROPLET_ID DROPLET_IP <<< $(doctl compute droplet create ${{ env.BRANCH_NAME }} --size s-2vcpu-4gb --image wordpress-20-04 --region nyc3 --ssh-keys ${{env.KEY_ID}} --format ID,PublicIPv4 --no-header --wait)
           echo "DROPLET_ID=$DROPLET_ID" >> $GITHUB_ENV
           echo "DROPLET_IP=$DROPLET_IP" >> $GITHUB_ENV
         env:
@@ -59,35 +59,23 @@ jobs:
             sleep 30
           done
 
-      - name: Install Nginx
-        run: |
-          until ssh -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no root@${{ env.DROPLET_IP }} "sudo apt-get update && sudo apt-get install -y nginx"
-          do
-            echo "Waiting until nginx installation is complete is complete..."
-            sleep 45
-          done
-
-      - name: Transfer index.html to droplet
-        run: |
-          scp -i ${{ github.workspace }}/deploy_key -o StrictHostKeyChecking=no ./index.html root@${{ env.DROPLET_IP }}:/var/www/html/
-
       # - name: Add A record for domain
       #   run: |
       #     doctl compute domain create ${{ env.DOMAIN_NAME }} --ip-address ${{ env.DROPLET_IP }}
       #   env:
       #     DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-      - name: Add A record for subdomain
-        run: |
-          doctl compute domain records create ${{ env.DOMAIN_NAME }} --record-type A --record-name ${{ env.BRANCH_NAME }} --record-data ${{ env.DROPLET_IP }} --record-ttl 3600
-        env:
-          DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      # - name: Add A record for subdomain
+      #   run: |
+      #     doctl compute domain records create ${{ env.DOMAIN_NAME }} --record-type A --record-name ${{ env.BRANCH_NAME }} --record-data ${{ env.DROPLET_IP }} --record-ttl 3600
+      #   env:
+      #     DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-      - name: Install Let's Encrypt
-        run: |
-          doctl compute certificate create --type lets_encrypt --name ${{ env.BRANCH_NAME }} --dns-names pandacalculus.com
-        env:
-          DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      # - name: Install Let's Encrypt
+      #   run: |
+      #     doctl compute certificate create --type lets_encrypt --name ${{ env.BRANCH_NAME }} --dns-names pandacalculus.com
+      #   env:
+      #     DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
       - name: Remove SSH key from DigitalOcean
         run: |
